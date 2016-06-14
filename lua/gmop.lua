@@ -36,7 +36,7 @@ function CMD.changetime(v)
     local time = v.time
     time = os.date("%m%d%H%M%Y.%S", time)
     if os.execute(sfmt(
-        'date %s && su - %s -c "cd server/bin && ./shaco-foot restart game"', 
+        'date %s && su - %s -c "cd server && ./shaco-foot restart game"', 
         time, __server)) then
         return {time=time}
     end
@@ -87,7 +87,9 @@ local function __timeloop(id)
                 break
             end
         else
-            __exec(id, {cmd="serverstatus"})
+            if tick%3==0 then
+                __exec(id, {cmd="serverstatus"})
+            end
         end
         shaco.sleep(1000)
         tick = tick+1
