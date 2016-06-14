@@ -87,9 +87,9 @@ local function __timeloop(id)
                 break
             end
         else
-            if tick%3==0 then
+            --if tick%3==0 then
                 __exec(id, {cmd="serverstatus"})
-            end
+            --end
         end
         shaco.sleep(1000)
         tick = tick+1
