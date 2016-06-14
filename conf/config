@@ -1,0 +1,14 @@
+local mypath="/Users/lvshaco/code/web1"
+maxsocket=64
+loglevel="."
+luacpath="./lib-l/?.so;./lib-3rd/?.so"
+--packagepath="./lib-package/lua-shaco.lso;./lib-package/examples.lso"
+luamodpath="./lua-mod/?.lua;./examples/?.lua;./examples/login/?.lua"
+luamodpath=mypath.."/lua/?.lua;"..luamodpath
+
+logfile=mypath.."/web1.log"
+start="gmop"
+webdir=mypath.."/html"
+user="qa"
+passwd="123"
+server="qzcs"

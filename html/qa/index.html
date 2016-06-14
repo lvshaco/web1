@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../iconfont/material-icons.css">
+    <link rel="stylesheet" href="../material.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="../material.min.js"></script>
+    <script src="../vue.min.js"></script>
+    <script src="../vue-resource.min.js"></script>
+  </head>
+  <body>
+    <dialog class="mdl-dialog @keyup.enter="click_login">
+    <div class="mdl-dialog__content">
+      <p>
+      </p>
+      <form action="#">
+        <div class="mdl-textfield mdl-js-textfield">
+          <input class="mdl-textfield__input" type="text" id="username">
+          <label class="mdl-textfield__label" for="username">Username...</label>
+        </div>
+      </form>
+      <form action="#">
+        <div class="mdl-textfield mdl-js-textfield">
+          <input class="mdl-textfield__input" type="password" id="password">
+          <label class="mdl-textfield__label" for="password">Password...</label>
+        </div>
+      </form>
+
+    </div>
+    <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+      <label style="text-align:left" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="remember">
+        <input type="checkbox" id="remember" class="mdl-checkbox__input" checked>Remember Me?</input>
+      </label>
+      <button style="text-align:center" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect"
+      @click="click_login">login</button>
+    </div>
+    </dialog>
+
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header ">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <span class="mdl-layout-title">QA</span>
+          <div class="mdl-layout-spacer"></div>
+          <button class="mdl-button mdl-js-button mdl-button--icon show-modal"
+          @click="click_account">
+            <i class="material-icons">{{loginicon}}</i>
+          </button>
+        </div>
+      </header>
+      <!--<div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">QA</span>
+      </div>-->
+      <main class="mdl-layout__content">
+      <div class="mdl-grid">
+        <div class="mdl-cell mdl-cell--8-col mdl-cell--2-offset"> 
+          <ul class="mdl-list ">
+            <li class="mdl-list__item mdl-list__item--three-line">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-avatar">report</i>
+                <span>{{server.name}}</span>
+                <span class="mdl-list__item-text-body">
+                  当前时间: {{server.time}}
+                </span>
+            </li>
+
+            <li class="mdl-list__item ">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-avatar">access_time</i>
+              </span>
+              <span class="mdl-list__item-primary-content">
+                <div class="mdl-textfield mdl-js-textfield">
+                  <input class="mdl-textfield__input" type="text" id="time1">
+                  <!-- pattern="[0-9]-[0-9]{1,2}-[0-9]{1,2}[ ][0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}"-->
+                  <label class="mdl-textfield__label" for="time1">{{server.time}}</label>
+                  <span class="mdl-textfield__error">Format: YYYY-mm-dd HH:MM:SS</span>
+                </div>
+              </span>
+              <span class="mdl-list__item-primary-content">
+                <button style="text-align:center" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect"
+                                                  @click="click_changetime">修改</button>
+              </span>
+            </li>
+            <li class="mdl-list__item ">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons mdl-list__item-avatar">add_alarm</i>
+              </span>
+              <span class="mdl-list__item-primary-content">
+                <div class="mdl-textfield mdl-js-textfield">
+                  <input class="mdl-textfield__input" type="text" id="time2"
+                                                                  pattern="[0-9]+">
+                  <label class="mdl-textfield__label" for="time2">30</label>
+                  <span class="mdl-textfield__error">Must be integer</span>
+                </div>
+              </span>
+              <span class="mdl-list__item-primary-content">
+                <button style="text-align:center" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect"
+                                                  @click="click_forwordtime">修改</button>
+              </span>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+      </main>
+    </div>
+    <script>
+
+function log(msg) {
+  //console.log(msg)
+}
+
+function setCookie(c_name,value,expiredays)
+{
+var exdate=new Date()
+exdate.setDate(exdate.getDate()+expiredays)
+document.cookie=c_name+ "=" +escape(value)+
+((expiredays==null) ? "" : ";expires="+exdate.toGMTString())
+}
+function getCookie(c_name)
+{
+if (document.cookie.length>0)
+  {
+  c_start=document.cookie.indexOf(c_name + "=")
+  if (c_start!=-1)
+    { 
+    c_start=c_start + c_name.length+1 
+    c_end=document.cookie.indexOf(";",c_start)
+    if (c_end==-1) c_end=document.cookie.length
+    return unescape(document.cookie.substring(c_start,c_end))
+    } 
+  }
+return ""
+}
+var dialog = document.querySelector('dialog');
+var ws_url = "ws://"+window.location.host+"/gmop";
+var ws
+var vm
+var waiting_cmd
+
+var CMD = {}
+CMD.serverstatus = function(v) {
+  vm.server = v
+}
+CMD.auth = function(v) {
+  vm.onlogined(true, v);
+  if (document.getElementById("remember").checked) {
+    setCookie("user", v.user, 30);
+    setCookie("passwd", v.passwd, 30);
+  }
+}
+function ws_create(user, passwd) {
+  ws = new WebSocket(ws_url);
+  ws.onopen = function() {
+    log("open");
+    ws_send("auth", {user:user, passwd:passwd});
+  }
+  ws.onmessage = function(e) {
+    var v = JSON.parse(e.data);
+    log(v)
+      if (v.cmd == waiting_cmd) {
+        waiting_cmd = null
+      } 
+    var f = CMD[v.cmd];
+    if (f) {
+      f(v.body)
+    } else {
+      log("Invalid message: "+e.data)
+    }
+  }
+  ws.onclose = function(e) {
+    log("closed");
+    vm.onlogined(false)
+  }
+}
+function ws_close() {
+  if (ws) {
+    ws.close()
+  }
+}
+function ws_send(cmd, body) {
+  var v = {cmd: cmd, body: body};
+  ws.send(JSON.stringify(v))
+}
+
+vm = new Vue({
+  el: 'body',
+  data: {
+    server: {
+      name: "xianxingfu",
+      time: "0000-00-00 00:00:00",
+      online: 0,
+    },
+    clienttime: "",
+    logined: false, // todo test
+    loginicon: "add_circle",
+  },
+  ready: function() {
+    // todo
+    var user = getCookie("user");
+    var passwd = getCookie("passwd");
+    if (user != "" && passwd != "") {
+      this.dologin(user, passwd);
+    }
+  },
+  methods: {
+    click_account: function(event) {
+      if (this.logined) {
+        // todo show account info
+      } else {
+        dialog.showModal();
+      }
+    },
+    click_login: function(event) {
+      dialog.close();
+
+      var user = document.getElementById("username").value;
+      var passwd = document.getElementById("password").value;
+      if (user != "" && passwd != "") {
+        this.dologin(user, passwd);
+      }
+    },
+    dologin: function(user, passwd) {
+      ws_create(user, passwd);
+    },
+    onlogined: function(ok, v) {
+      this.logined = ok;
+      if (ok) {
+        this.loginicon = "account_circle";
+        this.server.name = v.name;
+      } else {
+        this.loginicon = "add_circle";
+      }
+    },
+    click_changetime: function() {
+      var s = document.getElementById("time1").value;
+      var s = s.match("[0-9]{4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}");
+      if (s) {
+        s = parseInt(new Date(s[0]).getTime()/1000);
+        ws_send("changetime", {time: s})
+      }
+    },
+    click_forwordtime: function() {
+      var s = document.getElementById("time2").value;
+      var s = parseInt(s);
+      if (s && s>0) {
+        s *= 60;
+        s = parseInt(s+new Date(this.server.time).getTime()/1000);
+        ws_send("changetime", {time: s})
+      }
+    },
+  },
+})
+    </script>
+  </body>
+</html>
