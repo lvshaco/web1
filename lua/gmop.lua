@@ -26,11 +26,10 @@ local function __auth(v)
 end
 
 function CMD.serverstatus()
-    local r = {name=__name}
-    local f = io.popen('date "+%Y-%m-%d %H:%M:%S"', 'r')
-    r.time = f:read('l')
-    f:close()
-    return r
+    return {
+        name=__name,
+        time=os.date("%Y-%m-%d %H:%M:%S"),
+    }
 end
 
 function CMD.changetime(v)
@@ -173,16 +172,20 @@ shaco.start(function()
                 local ok2, err2 = pcall(function()
                     local ftype = string.match(uri, ".*[.]([^.]*)$")
                     local ctype = CTYPE[ftype] or CTYPE_UNKNOWN
-                    local size = 64*1024
-                    http.response(200, function()
-                        local data = f:read(size)
-                        if data and #data == size then
-                            shaco.sleep(1) -- sleep for socker send
-                        end
-                        return data
-                    end,
+                    local body = f:read("a")
+                    http.response(200, body, 
                     {["content-type"]=sfmt("%s",ctype), connection="close"},
                     httpsocket.sender(id))
+                    --local size = 64*1024
+                    --http.response(200, function()
+                    --    local data = f:read(size)
+                    --    if data and #data == size then
+                    --        shaco.sleep(1) -- sleep for socker send
+                    --    end
+                    --    return data
+                    --end,
+                    --{["content-type"]=sfmt("%s",ctype), connection="close"},
+                    --httpsocket.sender(id))
                 end)
                 f:close()
                 if ok2 then
