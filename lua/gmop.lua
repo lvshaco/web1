@@ -11,6 +11,7 @@ local __user = shaco.getenv("user")
 local __passwd = shaco.getenv("passwd")
 local __name = shaco.getenv("name") or "Test"
 local __server = shaco.getenv("server")
+local __server_dir = shaco.getenv("server_dir") or "server"
 
 assert(__user and __passwd, "Not user config")
 assert(__server, "Not server config")
@@ -36,8 +37,8 @@ function CMD.changetime(v)
     local time = v.time
     time = os.date("%m%d%H%M%Y.%S", time)
     if os.execute(sfmt(
-        'date %s && su - %s -c "cd server && ./shaco-foot restart game"', 
-        time, __server)) then
+        'date %s && su - %s -c "cd %s && ./shaco-foot restart game"', 
+        time, __server, __server_dir)) then
         return {time=time}
     end
 end
@@ -45,8 +46,8 @@ end
 function CMD.reset(v)
     local time = os.date("%m%d%H%M%Y.%S", os.time())
     if os.execute(sfmt(
-        'su - %s -c "cd server && mv bin/.time.tmp bin/.time.tmp.%s.%s "', 
-        __server, time, math.random())) then
+        'su - %s -c "cd %s && mv bin/.time.tmp bin/.time.tmp.%s.%s "', 
+        __server, __server_dir, time, math.random())) then
         return {}
     end
 end
