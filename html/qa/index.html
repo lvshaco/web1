@@ -79,7 +79,7 @@
               </span>
               <span class="mdl-list__item-primary-content">
                 <button style="text-align:center" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect"
-                                                  @click="click_changetime">修改</button>
+                                                  @click="click_changetime">修改并重启</button>
               </span>
             </li>
             <li class="mdl-list__item ">
@@ -96,10 +96,19 @@
               </span>
               <span class="mdl-list__item-primary-content">
                 <button style="text-align:center" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect"
-                                                  @click="click_forwordtime">修改</button>
+                                                  @click="click_forwordtime">修改并重启</button>
               </span>
             </li>
 
+            <li class="mdl-list__item ">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons mdl-list__item-avatar">report</i>
+              </span>
+              <span class="mdl-list__item-primary-content">
+                <button style="text-align:center" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect"
+                                                  @click="click_reset">清除服务器开服时间</button>
+              </span>
+            </li>
           </ul>
         </div>
       </div>
@@ -249,6 +258,9 @@ vm = new Vue({
         s = parseInt(s+new Date(this.server.time).getTime()/1000);
         ws_send("changetime", {time: s})
       }
+    },
+    click_reset: function() {
+    	ws_send("reset", {})
     },
   },
 })

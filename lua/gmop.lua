@@ -42,6 +42,15 @@ function CMD.changetime(v)
     end
 end
 
+function CMD.reset(v)
+    local time = os.date("%m%d%H%M%Y.%S", os.time())
+    if os.execute(sfmt(
+        'su - %s -c "cd server && mv bin/.time.tmp bin/.time.tmp.%s.%s "', 
+        __server, time, math.random())) then
+        return {}
+    end
+end
+
 local function __send(id, cmd, body)
     local str = cjson.encode({cmd=cmd, body=body})
     shaco.trace("Send:", id, str)
@@ -144,6 +153,7 @@ shaco.start(function()
             socket.readon(id)
             local code, method, uri, head_t, body, version = http.read(
             httpsocket.reader(id))
+            shaco.trace(id, addr, method, uri, version, code, body)
             if code ~= 200 then
                 socket.close(id)
                 return
@@ -156,7 +166,6 @@ shaco.start(function()
             --if uri == "/" then -- default for main
             --  uri = "/mdl/index.html"
             --end
-            shaco.trace(id, addr, method, uri, version, code, body)
             if uri == "/gmop" then -- tag websocket
                 agent_login(id, addr, code, method, uri, head_t, body, version)
             elseif string.find(uri, "favicon") then
