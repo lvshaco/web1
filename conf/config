@@ -1,4 +1,4 @@
-local mypath="/Users/lvshaco/code/web1"
+dofile "config.self"
 maxsocket=64
 loglevel="."
 luacpath="./lib-l/?.so;./lib-3rd/?.so"

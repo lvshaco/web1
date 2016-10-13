@@ -1,1 +1,3 @@
-cd ~/code/lshaco && ./shaco /Users/lvshaco/code/web1/conf/config
+curpath=`pwd`/conf/config
+pgrep -f "./shaco $curpath" |xargs kill -2
+cd bin && ./shaco $curpath --daemon 1
