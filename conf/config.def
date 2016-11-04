@@ -1,4 +1,4 @@
-dofile "config.self"
+mypath="/your_web1_home/web1"
 maxsocket=64
 loglevel="."
 luacpath="./lib-l/?.so;./lib-3rd/?.so"
