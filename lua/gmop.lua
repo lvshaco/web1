@@ -54,12 +54,12 @@ end
 
 local function __send(id, cmd, body)
     local str = cjson.encode({cmd=cmd, body=body})
-    shaco.trace("Send:", id, str)
+    shaco.debug("Send:", id, str)
     websocket.text(id, str)
 end
 
 local function __exec(id, v)
-    shaco.trace(id, tbl(v, "Cmd"))
+    shaco.debug(id, tbl(v, "Cmd"))
     local ag = assert(__agents[id], "No found agent:"..id)
     local body
     if not ag.logined then
